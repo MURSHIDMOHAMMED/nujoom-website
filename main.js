@@ -199,17 +199,19 @@ function setupListeners() {
     const loginBtn = document.getElementById('login-btn');
     if (loginBtn) {
         loginBtn.onclick = async () => {
-            const e = document.getElementById('login-email').value.trim();
+            const e = document.getElementById('login-email').value.trim().toLowerCase();
             const p = document.getElementById('login-pwd').value.trim();
-            try { await window.fb.signInWithEmailAndPassword(window.fb.auth, e, p); } catch (err) { alert(err.message); }
+            console.log("Attempting login with:", e);
+            try { await window.fb.signInWithEmailAndPassword(window.fb.auth, e, p); } catch (err) { alert("Login Error: " + err.message); }
         };
     }
     const signupBtn = document.getElementById('signup-btn');
     if (signupBtn) {
         signupBtn.onclick = async () => {
-            const e = document.getElementById('login-email').value.trim();
+            const e = document.getElementById('login-email').value.trim().toLowerCase();
             const p = document.getElementById('login-pwd').value.trim();
-            try { await window.fb.createUserWithEmailAndPassword(window.fb.auth, e, p); } catch (err) { alert(err.message); }
+            console.log("Attempting signup with:", e);
+            try { await window.fb.createUserWithEmailAndPassword(window.fb.auth, e, p); } catch (err) { alert("Signup Error: " + err.message); }
         };
     }
     
