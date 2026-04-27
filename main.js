@@ -199,16 +199,16 @@ function setupListeners() {
     const loginBtn = document.getElementById('login-btn');
     if (loginBtn) {
         loginBtn.onclick = async () => {
-            const e = document.getElementById('login-email').value;
-            const p = document.getElementById('login-pwd').value;
+            const e = document.getElementById('login-email').value.trim();
+            const p = document.getElementById('login-pwd').value.trim();
             try { await window.fb.signInWithEmailAndPassword(window.fb.auth, e, p); } catch (err) { alert(err.message); }
         };
     }
     const signupBtn = document.getElementById('signup-btn');
     if (signupBtn) {
         signupBtn.onclick = async () => {
-            const e = document.getElementById('login-email').value;
-            const p = document.getElementById('login-pwd').value;
+            const e = document.getElementById('login-email').value.trim();
+            const p = document.getElementById('login-pwd').value.trim();
             try { await window.fb.createUserWithEmailAndPassword(window.fb.auth, e, p); } catch (err) { alert(err.message); }
         };
     }
