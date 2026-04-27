@@ -110,6 +110,12 @@
 
         .view { display: none; }
         .view.active { display: block; }
+        .login-view {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, #0f172a, #334155);
+            z-index: 5000; display: none; align-items: center; justify-content: center; padding: 20px;
+        }
+        .login-view.active { display: flex !important; }
 
         .stat-card { border-radius: 20px; border: none; transition: all 0.3s; }
         .stat-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); }
@@ -141,6 +147,27 @@
 </head>
 <body class="bg-light">
     <div id="app">
+        <!-- Login View -->
+        <section id="login-view" class="login-view active">
+            <div class="branch-card text-center" style="max-width: 400px;">
+                <div class="logo justify-content-center mb-3">
+                    <div class="logo-icon">N</div>
+                    <span class="h4 mb-0 fw-bold ms-2">Nujoom Ledger</span>
+                </div>
+                <h3 class="fw-bold mb-4">Welcome Back</h3>
+                <div class="mb-3">
+                    <input type="email" id="login-email" class="form-control form-control-lg border-2" placeholder="Email">
+                </div>
+                <div class="mb-4">
+                    <input type="password" id="login-pwd" class="form-control form-control-lg border-2" placeholder="Password">
+                </div>
+                <div class="d-grid gap-2">
+                    <button id="login-btn" class="btn btn-primary btn-lg fw-bold">Login</button>
+                    <button id="signup-btn" class="btn btn-outline-secondary fw-bold">Sign Up</button>
+                </div>
+            </div>
+        </section>
+
         <!-- Branch Picker View -->
         <section id="branch-selection-view" class="view branch-view">
             <div class="branch-card text-center">
@@ -187,6 +214,9 @@
                     <button class="nav-item nav-trigger-dashboard" data-bs-dismiss="offcanvas">Dashboard</button>
                     <button class="nav-item nav-trigger-employee" data-bs-dismiss="offcanvas">Employee Docs</button>
                     <button class="nav-item nav-trigger-company" data-bs-dismiss="offcanvas">Company Docs</button>
+                    <button class="nav-item nav-trigger-settings" data-bs-dismiss="offcanvas">Alert Settings</button>
+                    <button class="nav-item nav-trigger-trash" data-bs-dismiss="offcanvas">Trash</button>
+                    <button class="nav-item text-danger logout-btn" style="display: none;">Logout</button>
                 </nav>
             </div>
         </div>
@@ -208,6 +238,11 @@
                 <button class="nav-item nav-trigger-dashboard">Dashboard</button>
                 <button class="nav-item nav-trigger-employee">Employee Documents</button>
                 <button class="nav-item nav-trigger-company">Company Documents</button>
+                <button class="nav-item nav-trigger-settings">Alert Settings</button>
+                <button class="nav-item nav-trigger-trash">Trash</button>
+                <div class="mt-auto">
+                    <button class="nav-item text-danger logout-btn w-100" style="display: none;">Logout</button>
+                </div>
             </nav>
         </aside>
 
@@ -263,7 +298,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-5"><div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead class="bg-light small"><tr><th class="ps-4">Date</th><th>BK</th><th>CAS</th><th>BA</th><th>CB</th><th>BB</th><th>INC</th><th>C.BK</th><th>C.CAS</th><th>C.INC</th><th class="pe-4 text-center">Act</th></tr></thead><tbody id="daily-entries-body"></tbody></table></div></div>
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-5"><div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead class="bg-light small"><tr><th class="ps-4">Date</th><th>BILL</th><th>CAS</th><th>BA</th><th>CB</th><th>BB</th><th>INC</th><th>C.BILL</th><th>C.CAS</th><th>C.INC</th><th class="pe-4 text-center">Act</th></tr></thead><tbody id="daily-entries-body"></tbody></table></div></div>
                 <div class="card border-0 shadow-sm p-4 mb-5"><h3 class="h5 fw-bold mb-4">Expenses Analysis</h3><div class="row g-3" id="expense-summary-grid"></div></div>
             </section>
 
@@ -278,145 +313,44 @@
                 <div class="table-responsive bg-white rounded-4 shadow-sm"><table class="table"><thead class="bg-light"><tr><th class="ps-4">Name</th><th>Doc</th><th>Expiry</th><th>Status</th><th class="pe-4 text-center">Act</th></tr></thead><tbody class="docs-list-body" data-type="company"></tbody></table></div>
                 <div class="mt-4 text-end"><button class="btn btn-primary add-doc-btn rounded-pill px-4 shadow" data-type="company" data-bs-toggle="modal" data-bs-target="#doc-modal">Add Document</button></div>
             </section>
+
+            <!-- Alert Settings View -->
+            <section id="settings-view" class="view">
+                <div class="card p-4 shadow-sm border-0 rounded-4">
+                    <h3 class="h5 fw-bold mb-4">Email Alert Control</h3>
+                    <p class="text-muted small">System automatically checks for expiries on page load and after every save. Use the button below to trigger a manual check.</p>
+                    <button id="check-expiry-btn" class="btn btn-outline-primary rounded-pill px-4 fw-bold">Check Email Expiry Alerts</button>
+                </div>
+            </section>
+            
+            <section id="trash-view" class="view">
+                <h3 class="h5 fw-bold mb-4">Deleted Items (Trash)</h3>
+                <div class="table-responsive bg-white rounded-4 shadow-sm">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4">Type</th>
+                                <th>Deleted At</th>
+                                <th>Details</th>
+                                <th class="pe-4 text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="trash-list-body"></tbody>
+                    </table>
+                </div>
+            </section>
         </main>
 
         <!-- Modals -->
-        <div class="modal fade" id="entry-modal" tabindex="-1"><div class="modal-dialog modal-lg modal-dialog-centered"><div class="modal-content border-0 shadow-lg rounded-5"><form id="entry-form"><div class="modal-body p-5"><h3 class="fw-bold mb-4 text-center">Daily Entry</h3><div class="row g-3"><div class="col-md-6"><label class="small fw-bold text-muted">DATE</label><input type="date" name="date" class="form-control border-2" required></div><div class="col-md-6"><label class="small fw-bold text-muted">BA IN</label><input type="number" name="ba" id="ba" class="form-control border-2" step="0.01"></div><div class="col-md-6"><label class="small fw-bold text-muted">CAS IN</label><input type="number" name="cas" id="cas" class="form-control border-2" step="0.01"></div><div class="col-md-6"><label class="small fw-bold text-muted">CB OUT</label><input type="number" name="cb" id="cb" class="form-control border-2" step="0.01"></div><div class="col-md-6"><label class="small fw-bold text-muted">BB OUT</label><input type="number" name="bb" id="bb" class="form-control border-2" step="0.01"></div><div class="col-12 mt-4"><label class="small fw-bold text-muted mb-2">OTHER EXPENSES</label><div id="other-expenses-container" class="d-flex flex-column gap-2"></div><button type="button" class="btn btn-outline-secondary btn-sm w-100 mt-2 rounded-pill fw-bold" onclick="addExpenseRow()">+ Add Expense</button></div></div><div class="p-4 bg-light rounded-4 mt-4 border"><div class="row text-center"><div class="col-6"><small class="text-muted fw-bold">Live BK (BB+CB)</small><div class="h4 text-primary mt-1" id="preview-bk">₹0</div></div><div class="col-6"><small class="text-muted fw-bold">Live INC (BK+CAS)</small><div class="h4 text-success mt-1" id="preview-inc">₹0</div></div></div></div></div><div class="modal-footer border-0 p-4 pt-0"><button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow">Save</button></div></form></div></div></div>
+        <div class="modal fade" id="entry-modal" tabindex="-1"><div class="modal-dialog modal-lg modal-dialog-centered"><div class="modal-content border-0 shadow-lg rounded-5"><form id="entry-form"><div class="modal-body p-5"><h3 class="fw-bold mb-4 text-center">Daily Entry</h3><div class="row g-3"><div class="col-md-6"><label class="small fw-bold text-muted">DATE</label><input type="date" name="date" class="form-control border-2" required></div><div class="col-md-6"><label class="small fw-bold text-muted">BA IN</label><input type="number" name="ba" id="ba" class="form-control border-2" step="0.01"></div><div class="col-md-6"><label class="small fw-bold text-muted">CAS IN</label><input type="number" name="cas" id="cas" class="form-control border-2" step="0.01"></div><div class="col-md-6"><label class="small fw-bold text-muted">CB OUT</label><input type="number" name="cb" id="cb" class="form-control border-2" step="0.01"></div><div class="col-md-6"><label class="small fw-bold text-muted">BB OUT</label><input type="number" name="bb" id="bb" class="form-control border-2" step="0.01"></div><div class="col-12 mt-4"><label class="small fw-bold text-muted mb-2">OTHER EXPENSES</label><div id="other-expenses-container" class="d-flex flex-column gap-2"></div><button type="button" class="btn btn-outline-secondary btn-sm w-100 mt-2 rounded-pill fw-bold" onclick="addExpenseRow()">+ Add Expense</button></div></div><div class="p-4 bg-light rounded-4 mt-4 border"><div class="row text-center"><div class="col-6"><small class="text-muted fw-bold">Live BILL (BB+CB)</small><div class="h4 text-primary mt-1" id="preview-bk">₹0</div></div><div class="col-6"><small class="text-muted fw-bold">Live INC (BILL+CAS)</small><div class="h4 text-success mt-1" id="preview-inc">₹0</div></div></div></div></div><div class="modal-footer border-0 p-4 pt-0"><button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow">Save</button></div></form></div></div></div>
         <div class="modal fade" id="doc-modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content border-0 shadow-lg rounded-5"><form id="doc-form"><div class="modal-body p-5"><h3 class="fw-bold mb-4">Document Details</h3><div class="row g-3"><div class="col-12"><label id="lblDocName" class="small fw-bold text-muted">DOC NAME</label><input type="text" name="docName" class="form-control border-2" required></div><div class="col-12"><label id="lblPersonName" class="small fw-bold text-muted">NAME</label><input type="text" name="personName" class="form-control border-2" required></div><div class="col-12"><label class="small fw-bold text-muted">CATEGORY</label><input type="text" name="docCategory" id="docCategory" list="common-docs" class="form-control border-2" placeholder="e.g. Visa, License, etc."></div><div class="col-12"><label class="small fw-bold text-muted">EXPIRY DATE</label><input type="date" name="expiryDate" id="expiryDate" class="form-control border-2" required></div></div></div><div class="modal-footer border-0 p-4 pt-0"><button type="submit" id="btn-save-doc" class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow">Save Document</button></div></form></div></div></div>
         <datalist id="common-docs"><option value="Passport"><option value="Visa"><option value="Trade License"><option value="VAT Certificate"><option value="Insurance"></datalist>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        let allData = JSON.parse(localStorage.getItem('nujoom_branch_data')) || { "Branch 1": [], "Branch 2": [] };
-        let currentBranch = localStorage.getItem('nujoom_current_branch') || null;
-        let documents = JSON.parse(localStorage.getItem('nujoom_documents')) || [];
-        let editingId = null, editingDocId = null, activeDocType = 'employee', selectedMonth = null;
-        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-
-        window.onload = function() { if (!currentBranch) showBranchPicker(); else startApp(currentBranch); setupListeners(); };
-
-        function showBranchPicker() { document.getElementById('branch-selection-view').classList.add('active'); renderBranchButtons(); }
-        function renderBranchButtons() {
-            const container = document.getElementById('branch-buttons'); container.innerHTML = '';
-            Object.keys(allData).forEach(name => {
-                const col = document.createElement('div'); col.className = 'col-6 mb-3';
-                col.innerHTML = `<div class="branch-item-btn shadow-sm"><div class="fw-bold h5 mb-2">${name}</div><div class="d-flex gap-2 justify-content-center"><button class="btn btn-sm btn-primary px-3 b-sel rounded-pill">Open</button><button class="btn btn-sm btn-light b-del rounded-pill">🗑️</button></div></div>`;
-                col.querySelector('.b-sel').onclick = () => selectBranch(name);
-                col.querySelector('.b-del').onclick = (e) => { e.stopPropagation(); deleteBranch(name); };
-                container.appendChild(col);
-            });
-        }
-
-        function selectBranch(n) { currentBranch = n; localStorage.setItem('nujoom_current_branch', n); startApp(n); }
-        function startApp(n) { document.getElementById('branch-selection-view').classList.remove('active'); document.querySelector('.content').style.display = 'block'; document.querySelectorAll('.active-branch-display').forEach(el => el.textContent = n); switchView('dashboard'); }
-        function deleteBranch(n) { if(confirm(`Delete "${n}"?`)) { delete allData[n]; saveAll(); renderBranchButtons(); } }
-
-        function switchView(v) {
-            document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
-            const targetId = v.endsWith('-view') ? v : v + '-view';
-            const target = document.getElementById(targetId);
-            if(target) target.classList.add('active');
-            const titleMap = { 'dashboard': 'Dashboard', 'employee-docs': 'Employee Documents', 'company-docs': 'Company Documents', 'month-detail': 'Monthly Ledger' };
-            document.getElementById('page-title').textContent = titleMap[v] || 'Nujoom Ledger';
-            document.getElementById('btn-print-ledger').style.display = v === 'month-detail' ? 'block' : 'none';
-            document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active'));
-            const navBase = v.split('-')[0];
-            document.querySelectorAll(`.nav-trigger-${navBase}`).forEach(x => x.classList.add('active'));
-            if(v.includes('dashboard')) renderDashboard();
-            if(v.includes('docs')) { const type = v.includes('employee') ? 'employee' : 'company'; activeDocType = type; renderDocuments(type); }
-            window.scrollTo(0,0);
-        }
-
-        function calculateEntry(e) { const bb = Number(e.bb)||0, cb = Number(e.cb)||0, cas = Number(e.cas)||0; return { bk: bb+cb, inc: (bb+cb)+cas, cas, cb, bb }; }
-
-        function renderDashboard() {
-            const grid = document.getElementById('months-grid'); grid.innerHTML = '';
-            let yi=0, yb=0; const entries = allData[currentBranch] || [];
-            for(let m=0; m<12; m++) {
-                const mEntries = entries.filter(e => new Date(e.date).getMonth() === m);
-                let mi=0, mb=0; mEntries.forEach(e => { const c = calculateEntry(e); mi+=c.inc; mb+=c.bk; });
-                yi+=mi; yb+=mb;
-                const col = document.createElement('div'); col.className = 'col-6 col-md-3';
-                col.innerHTML = `<div class="card p-4 border-0 shadow-sm stat-card h-100" style="cursor:pointer"><h5>${monthNames[m]}</h5><div class="text-success small fw-bold">₹${mi.toLocaleString()}</div><div class="text-danger small">Bills: ₹${mb.toLocaleString()}</div></div>`;
-                grid.appendChild(col);
-                col.onclick = () => { selectedMonth = m; switchView('month-detail'); renderMonthDetail(m); };
-            }
-            document.getElementById('year-income').textContent = `₹${yi.toLocaleString()}`;
-            document.getElementById('year-expense').textContent = `₹${yb.toLocaleString()}`;
-            document.getElementById('year-profit').textContent = `₹${(yi-yb).toLocaleString()}`;
-        }
-
-        function renderMonthDetail(m) {
-            const body = document.getElementById('daily-entries-body'); body.innerHTML = '';
-            const entries = (allData[currentBranch] || []).filter(e => new Date(e.date).getMonth() === m).sort((a,b) => new Date(a.date)-new Date(b.date));
-            let cbk=0, ccs=0, cin=0, tcas=0, tcb=0, tba=0, tbb=0; const summary = {};
-            entries.forEach(e => {
-                const c = calculateEntry(e); cbk+=c.bk; ccs+=c.cas; cin+=c.inc; tcas+=c.cas; tcb+=c.cb; tba+=Number(e.ba)||0; tbb+=Number(e.bb)||0;
-                if(e.otherExpenses) e.otherExpenses.forEach(x => summary[x.type] = (summary[x.type]||0) + Number(x.amt));
-                const tr = document.createElement('tr');
-                tr.innerHTML = `<td class="ps-4"><strong>${e.date}</strong></td><td>₹${c.bk}</td><td>₹${c.cas}</td><td>₹${e.ba||0}</td><td>₹${c.cb}</td><td>₹${c.bb}</td><td class="text-success fw-bold">₹${c.inc}</td><td>₹${cbk}</td><td>₹${ccs}</td><td class="text-primary fw-bold">₹${cin}</td><td class="text-center pe-4"><button class="btn btn-sm btn-light" onclick="editEntry(${e.id})">✏️</button></td>`;
-                body.appendChild(tr);
-            });
-            document.getElementById('cash-inflow').textContent = `₹${tcas.toLocaleString()}`;
-            document.getElementById('cash-outflow').textContent = `₹${tcb.toLocaleString()}`;
-            document.getElementById('cash-closing').textContent = `₹${(tcas-tcb).toLocaleString()}`;
-            document.getElementById('bank-inflow').textContent = `₹${tba.toLocaleString()}`;
-            document.getElementById('bank-outflow').textContent = `₹${tbb.toLocaleString()}`;
-            document.getElementById('bank-closing').textContent = `₹${(tba-tbb).toLocaleString()}`;
-            document.getElementById('selected-month-name').textContent = monthNames[m];
-            document.getElementById('print-month-name').textContent = monthNames[m];
-            document.getElementById('month-net-badge').textContent = `Net: ₹${(cin - cbk).toLocaleString()}`;
-            const sGrid = document.getElementById('expense-summary-grid'); sGrid.innerHTML = '';
-            Object.entries(summary).forEach(([k,v]) => { const col = document.createElement('div'); col.className = 'col-6 col-md-3'; col.innerHTML = `<div class="card p-3 border-0 bg-light rounded-3 shadow-sm small"><strong>${k}</strong><div>₹${v.toLocaleString()}</div></div>`; sGrid.appendChild(col); });
-        }
-
-        function renderDocuments(type) {
-            const body = document.querySelector(`.docs-list-body[data-type="${type}"]`); body.innerHTML = '';
-            const stats = document.getElementById(`${type}-stats`);
-            let exp=0, soon=0, act=0; const today = new Date(); today.setHours(0,0,0,0);
-            documents.filter(d => d.docType === type && d.branch === currentBranch).forEach(d => {
-                const expiry = new Date(d.expiryDate + 'T00:00:00'); const diff = Math.ceil((expiry - today)/(1000*60*60*24));
-                let s = 'Active', sc = 'status-active', txt = `In ${diff} days`;
-                if(diff < 0) { s = 'Expired'; sc = 'status-expired'; txt = `Expired ${Math.abs(diff)}d ago`; exp++; } else if(diff <= 30) { s = 'Soon'; sc = 'status-soon'; soon++; } else { act++; }
-                const tr = document.createElement('tr');
-                tr.innerHTML = `<td class="ps-4"><strong>${d.personName}</strong></td><td>${d.docName}</td><td>${d.expiryDate}<br><small class="${diff<0?'text-danger':(diff<=30?'text-warning':'text-muted')}">${txt}</small></td><td><span class="status-badge ${sc}">${s}</span></td><td class="pe-4 text-center d-flex gap-2 justify-content-center"><button class="btn btn-sm btn-light border shadow-sm" onclick="editDoc(${d.id})">✏️</button><button class="btn btn-sm btn-light border shadow-sm" onclick="deleteDoc(${d.id}, '${type}')">🗑️</button></td>`;
-                body.appendChild(tr);
-            });
-            stats.querySelector('.count-expired').textContent = exp; stats.querySelector('.count-soon').textContent = soon; stats.querySelector('.count-active').textContent = act;
-        }
-
-        function editDoc(id) {
-            editingDocId = id; const d = documents.find(x => x.id == id); activeDocType = d.docType;
-            const isC = activeDocType === 'company';
-            document.getElementById('lblDocName').textContent = isC ? 'COMPANY DOC' : 'DOC NAME';
-            document.getElementById('lblPersonName').textContent = isC ? 'OWNER NAME' : 'EMPLOYEE NAME';
-            document.getElementById('doc-form').reset();
-            Object.keys(d).forEach(k => { if(document.getElementById('doc-form').elements[k]) document.getElementById('doc-form').elements[k].value = d[k]; });
-            document.getElementById('btn-save-doc').textContent = 'Update Document';
-            new bootstrap.Modal(document.getElementById('doc-modal')).show();
-        }
-
-        function updateLiveCalc() { const bb = Number(document.getElementById('bb').value)||0, cb = Number(document.getElementById('cb').value)||0, cas = Number(document.getElementById('cas').value)||0; document.getElementById('preview-bk').textContent = `₹${(bb+cb).toLocaleString()}`; document.getElementById('preview-inc').textContent = `₹${((bb+cb)+cas).toLocaleString()}`; }
-        function setupListeners() {
-            document.getElementById('add-branch-btn').onclick = () => { const n = document.getElementById('new-branch-name').value; if(n){ if(!allData[n]) allData[n]=[]; saveAll(); renderBranchButtons(); document.getElementById('new-branch-name').value = ''; } };
-            document.getElementById('entry-form').onsubmit = (e) => { e.preventDefault(); const f = new FormData(e.target); const d = Object.fromEntries(f.entries()); d.otherExpenses = []; document.querySelectorAll('.exp-row').forEach(r => d.otherExpenses.push({type: r.querySelector('.e-t').value, amt: r.querySelector('.e-a').value})); d.id = editingId || Date.now(); if(editingId) allData[currentBranch] = allData[currentBranch].map(x => x.id == editingId ? d : x); else { if(!allData[currentBranch]) allData[currentBranch]=[]; allData[currentBranch].push(d); } saveAll(); bootstrap.Modal.getInstance(document.getElementById('entry-modal')).hide(); renderMonthDetail(selectedMonth); };
-            document.getElementById('doc-form').onsubmit = (e) => { e.preventDefault(); const formData = new FormData(e.target); const d = Object.fromEntries(formData.entries()); if(editingDocId) { documents = documents.map(x => x.id == editingDocId ? {...x, ...d} : x); } else { d.id = Date.now(); d.docType = activeDocType; d.branch = currentBranch; documents.push(d); } localStorage.setItem('nujoom_documents', JSON.stringify(documents)); bootstrap.Modal.getInstance(document.getElementById('doc-modal')).hide(); renderDocuments(activeDocType); editingDocId = null; };
-            document.querySelectorAll('.nav-trigger-dashboard').forEach(el => el.onclick = () => switchView('dashboard'));
-            document.querySelectorAll('.nav-trigger-employee').forEach(el => el.onclick = () => switchView('employee-docs'));
-            document.querySelectorAll('.nav-trigger-company').forEach(el => el.onclick = () => switchView('company-docs'));
-            document.querySelectorAll('.branch-switch-trigger').forEach(el => el.onclick = () => showBranchPicker());
-            document.getElementById('back-to-dashboard').onclick = () => switchView('dashboard');
-            document.getElementById('btn-print-ledger').onclick = () => window.print();
-            document.getElementById('add-entry-btn').onclick = () => { editingId = null; document.getElementById('entry-form').reset(); document.getElementById('other-expenses-container').innerHTML = ''; updateLiveCalc(); };
-            ['cas','ba','cb','bb'].forEach(id => document.getElementById(id).oninput = updateLiveCalc);
-            document.querySelectorAll('.add-doc-btn').forEach(b => b.onclick = () => { editingDocId = null; document.getElementById('doc-form').reset(); document.getElementById('btn-save-doc').textContent = 'Save Document'; activeDocType = b.dataset.type; const isC = activeDocType === 'company'; document.getElementById('lblDocName').textContent = isC ? 'COMPANY DOC' : 'DOC NAME'; document.getElementById('lblPersonName').textContent = isC ? 'OWNER NAME' : 'EMPLOYEE NAME'; document.getElementById('docCategory').value = isC ? 'License' : 'Passport'; });
-        }
-        function addExpenseRow(t='', a='') { const div = document.createElement('div'); div.className = 'exp-row d-flex gap-2'; div.innerHTML = `<input type="text" class="e-t form-control form-control-sm border-0 bg-transparent" placeholder="Type" value="${t}"><input type="number" class="e-a form-control form-control-sm border-0 bg-transparent" placeholder="₹" value="${a}"><button type="button" class="btn btn-sm text-danger" onclick="this.parentElement.remove()">✕</button>`; document.getElementById('other-expenses-container').appendChild(div); }
-        function editEntry(id) { editingId = id; const e = allData[currentBranch].find(x => x.id == id); Object.keys(e).forEach(k => { if(document.getElementById('entry-form').elements[k]) document.getElementById('entry-form').elements[k].value = e[k]; }); document.getElementById('other-expenses-container').innerHTML = ''; if(e.otherExpenses) e.otherExpenses.forEach(x => addExpenseRow(x.type, x.amt)); updateLiveCalc(); new bootstrap.Modal(document.getElementById('entry-modal')).show(); }
-        function deleteDoc(id, type) { if(confirm('Delete?')){ documents = documents.filter(x => x.id!=id); localStorage.setItem('nujoom_documents', JSON.stringify(documents)); renderDocuments(type); } }
-        function saveAll() { localStorage.setItem('nujoom_branch_data', JSON.stringify(allData)); }
-        window.editEntry = editEntry; window.deleteDoc = deleteDoc; window.editDoc = editDoc; window.addExpenseRow = addExpenseRow;
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script type="module" src="firebase-app.js"></script>
+    <script type="module" src="email-alerts.js"></script>
+    <script type="module" src="main.js"></script>
 </body>
 </html>
