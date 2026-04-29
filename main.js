@@ -148,7 +148,16 @@ function renderMonthDetail(m) {
     let cbk=0, ccs=0, cin=0, tcas=0, tcb=0, tba=0, tbb=0; const summary = {};
     entries.forEach(e => {
         const c = calculateEntry(e); cbk+=c.bk; ccs+=c.cas; cin+=c.inc; tcas+=c.cas; tcb+=c.cb; tba+=Number(e.ba)||0; tbb+=Number(e.bb)||0;
-        if(e.otherExpenses) e.otherExpenses.forEach(x => summary[x.type] = (summary[x.type]||0) + Number(x.amt));
+        if(e.otherExpenses) {
+            e.otherExpenses.forEach(x => {
+                const type = x.type || 'Other';
+                if(!summary[type]) summary[type] = { total: 0, date: null };
+                summary[type].total += (Number(x.amt) || 0);
+                if (e.date && (!summary[type].date || new Date(e.date) > new Date(summary[type].date))) {
+                    summary[type].date = e.date;
+                }
+            });
+        }
         const tr = document.createElement('tr');
         tr.innerHTML = `<td class="ps-4"><strong>${e.date}</strong></td><td>₹${c.bk}</td><td>₹${c.cas}</td><td>₹${e.ba||0}</td><td>₹${c.cb}</td><td>₹${c.bb}</td><td class="text-success fw-bold">₹${c.inc}</td><td>₹${cbk}</td><td>₹${ccs}</td><td class="text-primary fw-bold">₹${cin}</td><td class="text-center pe-4 d-flex gap-2"><button class="btn btn-sm btn-light" onclick="editEntry(${e.id})">✏️</button><button class="btn btn-sm btn-light" onclick="deleteEntry(${e.id})">🗑️</button></td>`;
         body.appendChild(tr);
@@ -163,7 +172,16 @@ function renderMonthDetail(m) {
     document.getElementById('print-month-name').textContent = monthNames[m];
     document.getElementById('month-net-badge').textContent = `Net: ₹${(cin - cbk).toLocaleString()}`;
     const sGrid = document.getElementById('expense-summary-grid'); sGrid.innerHTML = '';
-    Object.entries(summary).forEach(([k,v]) => { const col = document.createElement('div'); col.className = 'col-6 col-md-3'; col.innerHTML = `<div class="card p-3 border-0 bg-light rounded-3 shadow-sm small"><strong>${k}</strong><div>₹${v.toLocaleString()}</div></div>`; sGrid.appendChild(col); });
+    Object.entries(summary).forEach(([k,v]) => { 
+        const col = document.createElement('div'); col.className = 'col-6 col-md-3 mb-3'; 
+        col.innerHTML = `
+            <div class="card p-3 border-0 bg-light rounded-4 shadow-sm h-100">
+                <div class="fw-bold text-dark text-truncate mb-1" title="${k}">${k}</div>
+                <div class="text-muted small mb-2" style="font-size: 0.75rem;">Last: ${v.date || 'No date'}</div>
+                <div class="h6 mb-0 text-primary fw-bold">₹${v.total.toLocaleString()}</div>
+            </div>`; 
+        sGrid.appendChild(col); 
+    });
 }
 
 function renderDocuments(type) {
